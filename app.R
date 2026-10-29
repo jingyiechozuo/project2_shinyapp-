@@ -1,7 +1,7 @@
 
   # author: Jingyi Zuo
   # O*NET Occupational Skills Explorer
-  # Explore 2026 O*NET occupations by skill dimensions, industry type and preparation levels
+  # Explore 2026 O*NET occupations by skill dimensions, occupation group type and preparation levels
 
 library(shiny)
 library(bslib)
@@ -39,7 +39,7 @@ ui <- page_sidebar(
     # "About" tab: introduction of this app interaction
     nav_panel("About",
               h3("Purpose"),
-              p("This explorer allows you to explore how skill profiles differ across Industries, the skill dimension they rely most on and levels of preparation."),
+              p("This explorer allows you to explore how skill profiles differ across occupation groups, the skill dimension they rely most on and levels of preparation."),
               h3("Data"),
               p("Data come from the",
                 a("O*NET 31.0 Database (2026)", href = "https://www.onetcenter.org/database.html"),
@@ -49,7 +49,7 @@ ui <- page_sidebar(
               tags$ul(
                 tags$li("Sidebar: choose subsets of the data, then click 'Apply Filters'."),
                 tags$li("Data Download: view the data you chose, and save it as a csv. file."),
-                tags$li("Data Exploration: one-way and two ways contigency tables, numerical summaries, and different types of plots.")
+                tags$li("Data Exploration: one-way and two ways contigency tables, numerical summaries, and different types of plots, depending on which variables you chose. Attention: The heatmap shows the average of the selected numeric variable by occupation group and preparation level, which are fixed.")
               ),
               img(src = "onet.png")
     ),
@@ -82,7 +82,7 @@ ui <- page_sidebar(
                                               choices = numeric_vars, selected = "programming"),
                                selectizeInput("group_var", "Summarize Across", choices = cat_vars),
                                radioButtons("plot_type", "Plot Type",
-                                            choices = c("Histogram", "Box Plot", "Scatter Plot"),
+                                            choices = c("Histogram", "Box Plot", "Scatter Plot","Heatmap"),
                                             inline = TRUE),
                                conditionalPanel("input.plot_type == 'Scatter Plot'",
                                                 selectizeInput("num_y", "Y Variable",
@@ -179,6 +179,71 @@ server <- function(input, output, session) {
     }
   })
   
+# Data exploration tab: numeric summaries
+  
+  # mean, median, and SD of the numeric variable at each level of the categorical variables
+  output$num_table <- renderTable({
+    df <- subset_data$df
+    validate(need(nrow(df) > 0, "No occupations match your filters. Please select again."))
+    summarise_by(df, input$group_var, input$num_x)
+  })
+  
+  # histogram, scatter plot, box plot, or heatmap
+  output$num_plot <- renderPlot({
+    df <- subset_data$df
+    validate(need(nrow(df) > 0, "No occupations match your filters. Please select again."))
+    
+    if (input$plot_type == "Histogram") {
+      p <- ggplot(df,
+                  aes(x = .data[[input$num_x]])) +
+        geom_histogram() +
+        labs(title = paste(label(input$num_x), "scores"),
+             x = paste(label(input$num_x), "scores"),
+             y = "Number of occupations")
+      
+    } else if (input$plot_type == "Scatter Plot") {
+      p <- ggplot(df,
+                  aes(x = .data[[input$group_var]], y = .data[[input$num_x]])) +
+        geom_point() +
+        labs(title = paste("Scatter of", label(input$num_x), "scores by", label(input$group_var)),
+             y = paste(label(input$num_x), "scores"),
+             x = label(input$group_var))
+      
+    } else if (input$plot_type == "Box Plot") {
+      p <- ggplot(df,
+                  aes(x = .data[[input$num_x]], y = .data[[input$group_var]])) +
+        geom_boxplot() +
+        labs(title = paste("Box Plot of", label(input$num_x), "scores by", label(input$group_var)),
+             y = label(input$group_var),
+             x = paste(label(input$num_x), "scores"))
+      
+    } else {
+      # heatmap
+      grouped <- group_by(df, major_group, preparation)
+      means <- summarise(grouped, mean = mean(.data[[input$num_x]]))
+      p <- ggplot(means, aes(x = preparation, y = major_group, fill = mean)) +
+        geom_tile(color = "blue") +
+        scale_fill_gradient() +
+        labs(title = paste("Average score",label(input$num_x),"by occupation groups and preparation levels"),
+             x = "preparation level", y = "occupation groups", fill = paste("Mean score of",label(input$num_x)))
+      return(p)
+    }
+    
+    # color
+    if (input$color_var != "none") {
+      if (input$plot_type == "Scatter Plot") {
+        p <- p + aes(color = .data[[input$color_var]]) + labs(color = label(input$color_var))
+      } else {
+        p <- p + aes(fill = .data[[input$color_var]]) + labs(fill = label(input$color_var))
+      }
+    }
+    
+    # facet
+    if (input$facet_var != "none") {
+      p <- p + facet_wrap(vars(.data[[input$facet_var]]))
+    }
+    p
+  })
 }
 
 shinyApp(ui = ui, server = server)

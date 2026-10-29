@@ -7,11 +7,11 @@ format: html
 
 
 ## DATA description 
-o\*net is dataset about the occupations and their characteristics in the U.S. Based on my project about the relationship between occupations and skills required by occupations, I chose this dataset including the major types of occupations (industry, preparation level), occupation codes and titles, 35 occupation skills, education level required by the occupations, and the skill dimension I extarcted before. Specifically, for each skill, we have a score for their importance in this occupation from 0-5 (continuous variables), and other variables are categorical variables. I chose 3 skills in each factor dimension, so we have 12 skills in total. 
+o\*net is dataset about the occupations and their characteristics in the U.S. Based on my project about the relationship between occupations and skills required by occupations, I chose this dataset including the major types of occupations (occupation group, preparation level), occupation codes and titles, 35 occupation skills, education level required by the occupations, and the skill dimension I extarcted before. Specifically, for each skill, we have a score for their importance in this occupation from 0-5 (continuous variables), and other variables are categorical variables. I chose 3 skills in each factor dimension, so we have 12 skills in total. 
 Specifically, we have:
   1. occupation unique codes and titles 
   2. job zone (the preparation level needed before people enter these occupations)
-  3. major groups (the major type of occupations)
+  3. occupation groups (the major type of occupations)
   4. scores on skill dimensions
   5. scores on 12 specific skills
   
@@ -69,12 +69,12 @@ Occupations who focus on technical skills have the most amounts, while who focus
 ggplot(data,
        aes(x = skill_type, fill = major_group)) + 
   geom_bar(position = "dodge") +
-  labs(title = "Occuparion industry by skill dimension",
+  labs(title = "Occuparion occupation group by skill dimension",
        x = "skill dimensions", y = "Number of Occuaptions",
-       fill = "Occupation industry")
+       fill = "Occupation occupation group")
 
 ```
-For the analytically-based occuparions, they are concentrated on STEM industry; for the communication-based occupations, they are concentrated in Education, legal, soial& arts, and Healthcare industries; for the management-based occupations, they are concentrated in many industries, especially business; for the technical-based industry, they are concentrated in construction, production and transport, so the technical skills are actually mechnical skills from this point. 
+For the analytically-based occuparions, they are concentrated on STEM occupation group; for the communication-based occupations, they are concentrated in Education, legal, soial& arts, and Healthcare occupation groups; for the management-based occupations, they are concentrated in many occupation groups, especially business; for the technical-based occupation group, they are concentrated in construction, production and transport, so the technical skills are actually mechnical skills from this point. 
 
 
 ## Histogram Plot - numerical variables
@@ -115,9 +115,9 @@ Analytical scores are increasing as the preparation level improves.
 ggplot(data,
        aes(x = major_group, y = coordination)) +
   geom_point() +
-  labs(title = "Scattor of coordinatingl scores by industry",
+  labs(title = "Scattor of coordinatingl scores by occupation group",
        y = "Coordication specific skill scores",
-       x = "Industry")
+       x = "occupation group")
 
 ```
 
@@ -128,8 +128,8 @@ ggplot(data,
 ggplot(data,
        aes(x = analytical, y = major_group)) +
   geom_boxplot() +
-  labs(title = "Box Plot of analytical scores by industry",
-       y = "Industry",
+  labs(title = "Box Plot of analytical scores by occupation group",
+       y = "occupation group",
        x = "Analytical scores")
 
 ```
@@ -145,8 +145,8 @@ data |>
   ggplot(aes(x = skills, y = major_group, fill = mean)) +
   geom_tile(color = "blue") +
   scale_fill_gradient() +
-  labs(title = "Average skill scores on each dimension by industry",
-       x = "skill dimension", y = "Industry", fill = "Mean score")
+  labs(title = "Average skill scores on each dimension by occupation group",
+       x = "skill dimension", y = "occupation group", fill = "Mean score")
 ```
 Each occupation group relies most on one skill dimension: STEM on analytical skill, management and business on management skill; healthcare and education on communication skill; construction, production, and transport on technical skill.
 
