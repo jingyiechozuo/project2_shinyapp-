@@ -6,7 +6,7 @@ format: html
 
 
 
-## Static statistic description 
+## DATA description 
 o\*net is dataset about the occupations and their characteristics in the U.S. Based on my project about the relationship between occupations and skills required by occupations, I chose this dataset including the major types of occupations (industry, preparation level), occupation codes and titles, 35 occupation skills, education level required by the occupations, and the skill dimension I extarcted before. Specifically, for each skill, we have a score for their importance in this occupation from 0-5 (continuous variables), and other variables are categorical variables. I chose 3 skills in each factor dimension, so we have 12 skills in total. 
 Specifically, we have:
   1. occupation unique codes and titles 
@@ -15,7 +15,7 @@ Specifically, we have:
   4. scores on skill dimensions
   5. scores on 12 specific skills
   
-
+## Read data
 ```{r}
 #read data
 library(tidyverse)
@@ -25,6 +25,7 @@ data <- read.csv("onet_2026_clean.csv") |>
 ```
 
 
+## Contingency tables - categorical variables
 ```{r}
 # investigate data
 table(data$job_zone)
@@ -49,7 +50,7 @@ summarise_onet("skill_type")
 summarise_onet("major_group")
 ```
 
-Bar Chart
+## Bar Chart
 ```{r}
 # bar chart 
 library(ggplot2)
@@ -62,7 +63,7 @@ ggplot(data,
 ```
 Occupations who focus on technical skills have the most amounts, while who focus on the analytival skills have the least. 
 
-Side by side plot 
+## Side by side bar chart plot 
 ```{r}
 
 ggplot(data,
@@ -76,7 +77,7 @@ ggplot(data,
 For the analytically-based occuparions, they are concentrated on STEM industry; for the communication-based occupations, they are concentrated in Education, legal, soial& arts, and Healthcare industries; for the management-based occupations, they are concentrated in many industries, especially business; for the technical-based industry, they are concentrated in construction, production and transport, so the technical skills are actually mechnical skills from this point. 
 
 
-Histogram Plot
+## Histogram Plot - numerical variables
 ```{r}
 
 ggplot(data,
@@ -89,7 +90,7 @@ ggplot(data,
 ```
 The distribution of the analytical skill scores is right-skewed. The peak of analytically skill scores is lower than 0 (the average), too. More than half of the occupations' analytical scores are lower than the average. 
 
-Histogram plot (facted version)
+## Histogram plot (facted version)
 
 ```{r}
 
@@ -107,20 +108,34 @@ ggplot(data,
 ```
 Analytical scores are increasing as the preparation level improves. 
 
-Box plot
+
+## scattor plot
+```{r}
+
+ggplot(data,
+       aes(x = major_group, y = coordination)) +
+  geom_point() +
+  labs(title = "Scattor of coordinatingl scores by industry",
+       y = "Coordication specific skill scores",
+       x = "Industry")
+
+```
+
+
+## Box plot
 ```{r}
 
 ggplot(data,
        aes(x = analytical, y = major_group)) +
   geom_boxplot() +
-  labs(title = "Box Plot of Analytical scores by major groups",
+  labs(title = "Box Plot of analytical scores by industry",
        y = "Industry",
        x = "Analytical scores")
 
 ```
 
 
-Heatmap
+## Heatmap
 
 ```{r}
 data |>

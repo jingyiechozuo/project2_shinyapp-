@@ -1,8 +1,7 @@
 
-
-#author: Jingyi Zuo
-#O*NET Occupational Skills Explorer
-# Explore 2026 O*NET occupations by skill dimensions, industry type and preparation levels
+  # author: Jingyi Zuo
+  # O*NET Occupational Skills Explorer
+  # Explore 2026 O*NET occupations by skill dimensions, industry type and preparation levels
 
 library(shiny)
 library(bslib)
@@ -14,9 +13,10 @@ source("helper.R")
 ui <- page_sidebar(
   title = "O*NET Occupational Skills Explorer",
   
-  # sidebar is designed: subset the data
+# sidebar is designed: subset the data
   sidebar = sidebar(
-    # categorical variables checkbox, and at first all levels checked by default
+  # 
+  # categorical variables checkbox, and at first all levels checked by default
     checkboxGroupInput(inputId = "group_sub", label = "Occupation Group", choices = group_levels, selected = group_levels),
     checkboxGroupInput(inputId = "prep_sub", label = "Preparation level", choices = prep_vars, selected = prep_vars),
     checkboxGroupInput(inputId = "skill_sub", label = "Skill Type", choices = skill_levels, selected = skill_levels),
@@ -34,6 +34,7 @@ ui <- page_sidebar(
   
   # main panel: three tabs
   navset_tab(
+    
     
     # "About" tab: introduction of this app interaction
     nav_panel("About",
@@ -53,16 +54,17 @@ ui <- page_sidebar(
               img(src = "onet.png")
     ),
     
-    # Data download tab
+# Data download tab
     nav_panel("Data Download",
               downloadButton("download", "Download CSV"),
               DT::dataTableOutput("data_table")
     ),
     
-    # Data exploration tab
+# Data exploration tab
     nav_panel("Data Exploration",
               radioButtons("summary_type", "Summary Type",
                            choices = c("Categorical", "Numeric"), inline = TRUE),
+              
               
               # categorical summaries
               conditionalPanel("input.summary_type == 'Categorical'",
@@ -71,6 +73,7 @@ ui <- page_sidebar(
                                               choices = c("None" = "none", cat_vars)),
                                tableOutput("cat_table"),
                                withSpinner(plotOutput("cat_plot"))
+                               
               ),
               
               # numeric summaries
@@ -97,7 +100,7 @@ ui <- page_sidebar(
 )
 server <- function(input, output, session) {
   
-  # dynamic sliders: the range follows the selected variable
+# dynamic sliders: the range follows the selected variable, but round to integers and use 0.1 as interval. 
   output$slider1 <- renderUI({
     x <- data[[input$num1]]
     sliderInput("range1", paste("Range of", label(input$num1)),
@@ -112,7 +115,7 @@ server <- function(input, output, session) {
                 value = c(floor(min(x)), ceiling(max(x))), step = 0.1)
   })
   
-  # subsetted data: starts as the full data, updates only when the button is clicked
+## subsetted data (which user selected): starts as the full data, updates only when the button is clicked
   subset_data <- reactiveValues(df = data)
   
   observeEvent(input$subset, {
@@ -123,5 +126,60 @@ server <- function(input, output, session) {
              between(.data[[input$num1]], input$range1[1], input$range1[2]),
              between(.data[[input$num2]], input$range2[1], input$range2[2]))
   })
+# data table of the selected data
+  output$data_table <- DT::renderDataTable({
+    validate(need(nrow(subset_data$df) > 0,
+                  "No occupations match your filters. Please widen them."))
+    subset_data$df
+  })
+  
+# download the subsetted data as a CSV file
+  output$download <- downloadHandler(
+    filename = function() {
+      "onet_subset.csv"
+    },
+    content = function(file) {
+      write.csv(subset_data$df, file, row.names = FALSE)
+    }
+  )
+  
+  # Data exploration tab: categorical summaries
+  # one-way or two-way contingency table
+  output$cat_table <- renderTable({
+    df <- subset_data$df
+    # if no occupations satisfy the selection criteria
+    validate(need(nrow(df) > 0, "No occupations match your filters. Please select again."))
+    if (input$cat2 == "none") {
+      count(df, .data[[input$cat1]])
+    } else {
+      # if the same variable is chosen twice, show a message
+      validate(need(input$cat1 != input$cat2, "Please choose two different variables."))
+      counts <- count(df, .data[[input$cat1]], .data[[input$cat2]])
+      pivot_wider(counts, names_from = all_of(input$cat2), values_from = n, values_fill = 0)
+    }
+  })
+  
+  # bar chart
+  output$cat_plot <- renderPlot({
+    df <- subset_data$df
+    validate(need(nrow(df) > 0, "No occupations match your filters."))
+    
+    if (input$cat2 == "none") {
+      ggplot(df, aes(x = .data[[input$cat1]])) +
+        geom_bar() +
+        labs(title = paste("Number of Occupations by", label(input$cat1)),
+             x = label(input$cat1), y = "Number of occupations")
+    } else {
+      validate(need(input$cat1 != input$cat2, "Please choose two different variables."))
+      ggplot(df, aes(x = .data[[input$cat1]], fill = .data[[input$cat2]])) +
+        geom_bar(position = "dodge") +
+        labs(title = paste(label(input$cat1), "by", label(input$cat2)),
+             x = label(input$cat1), y = "Number of occupations",
+             fill = label(input$cat2))
+    }
+  })
+  
 }
+
 shinyApp(ui = ui, server = server)
+
