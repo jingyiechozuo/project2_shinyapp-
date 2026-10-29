@@ -48,3 +48,76 @@ summarise_onet("preparation")
 summarise_onet("skill_type")
 summarise_onet("major_group")
 ```
+
+Bar Chart
+```{r}
+# bar chart 
+library(ggplot2)
+ggplot(data, 
+       aes(x = skill_type)) +
+  geom_bar(fill = "blue") +
+  labs(title = "Occupations distributions by skill dimension",
+       x = "Skill dimension", y = "Number of occupations")
+
+```
+Occupations who focus on technical skills have the most amounts, while who focus on the analytival skills have the least. 
+
+Side by side plot 
+```{r}
+
+ggplot(data,
+       aes(x = skill_type, fill = major_group)) + 
+  geom_bar(position = "dodge") +
+  labs(title = "Occuparion industry by skill dimension",
+       x = "skill dimensions", y = "Number of Occuaptions",
+       fill = "Occupation industry")
+
+```
+For the analytically-based occuparions, they are concentrated on STEM industry; for the communication-based occupations, they are concentrated in Education, legal, soial& arts, and Healthcare industries; for the management-based occupations, they are concentrated in many industries, especially business; for the technical-based industry, they are concentrated in construction, production and transport, so the technical skills are actually mechnical skills from this point. 
+
+
+Histogram Plot
+```{r}
+
+ggplot(data,
+       aes(x = analytical)) +
+  geom_histogram() +
+  labs(title = "Analytical scores",
+       x = "Analytical-skil scores",
+       y = "Number of occupartions")
+
+```
+The distribution of the analytical skill scores is right-skewed. The peak of analytically skill scores is lower than 0 (the average), too. More than half of the occupations' analytical scores are lower than the average. 
+
+Histogram plot (facted version)
+
+```{r}
+
+
+
+ggplot(data,
+       aes(x = analytical, fill = preparation)) +
+  geom_histogram() +
+  facet_wrap(~preparation) +
+  labs(title = "Analytical scores by preparation level of occupations",
+       x = "Analytical-skil scores",
+       y = "Number of occupartions",
+       fill = "Preparation levels")
+
+```
+Analytical scores are increasing as the preparation level improves. 
+
+Box plot
+```{r}
+
+ggplot(data,
+       aes(x = analytical, y = major_group)) +
+  geom_boxplot() +
+  labs(title = "Box Plot of Analytical scores by major groups",
+       y = "Industry",
+       x = "Analytical scores")
+
+```
+
+
+Heatmap
