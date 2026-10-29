@@ -105,7 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="data-description" class="level2">
 <h2 class="anchored" data-anchor-id="data-description">DATA description</h2>
-<p>o*net is dataset about the occupations and their characteristics in the U.S. Based on my project about the relationship between occupations and skills required by occupations, I chose this dataset including the major types of occupations (occupation group, preparation level), occupation codes and titles, 35 occupation skills, education level required by the occupations, and the skill dimension I extarcted before. Specifically, for each skill, we have a score for their importance in this occupation from 0-5 (continuous variables), and other variables are categorical variables. I chose 3 skills in each factor dimension, so we have 12 skills in total. Specifically, we have: 1. occupation unique codes and titles 2. job zone (the preparation level needed before people enter these occupations) 3. occupation groups (the major type of occupations) 4. scores on skill dimensions 5. scores on 12 specific skills</p>
+<p>O*net is dataset about the occupations and their characteristics in the U.S. Based on my project about the relationship between occupations and skills required by occupations, I chose this dataset including the major types of occupations (occupation group, preparation level), occupation codes and titles, 35 occupation skills, education level required by the occupations, and the skill dimension I extarcted before. For each skill dimensions, we have the occupations’ factor scores on each skill dimensions. Also, the skill dimension itself could also be a characteristic of occupation - which means the skill the occupation rely most on. Specifically, for each specific skill, we have a score for their importance in this occupation from 0-5 (continuous variables), and other variables are categorical variables. I chose 3 skills in each factor dimension, so we have 12 skills in total. Specifically, we have: 1. occupation unique codes and titles 2. job zone (the preparation level needed before people enter these occupations) 3. occupation groups (the major type of occupations) 4. skill dimension the occupation relies most on (in which dimension, the factor score is the highest) 4. scores on skill dimensions 5. scores on 12 specific skills</p>
 </section>
 <section id="read-data" class="level2">
 <h2 class="anchored" data-anchor-id="read-data">Read data</h2>
@@ -331,8 +331,8 @@ Construction, Production &amp; Transport      Education, Legal, Social &amp; Art
 </div>
 <p>The distribution of the analytical skill scores is right-skewed. The peak of analytically skill scores is lower than 0 (the average), too. More than half of the occupations’ analytical scores are lower than the average.</p>
 </section>
-<section id="histogram-plot-facted-version" class="level2">
-<h2 class="anchored" data-anchor-id="histogram-plot-facted-version">Histogram plot (facted version)</h2>
+<section id="histogram-plot-facted-version" class="level1">
+<h1>Histogram plot (facted version)</h1>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data,</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> analytical, <span class="at">fill =</span> preparation)) <span class="sc">+</span></span>
@@ -354,7 +354,6 @@ Construction, Production &amp; Transport      Education, Legal, Social &amp; Art
 </div>
 </div>
 <p>Analytical scores are increasing as the preparation level improves.</p>
-</section>
 <section id="scattor-plot" class="level2">
 <h2 class="anchored" data-anchor-id="scattor-plot">scattor plot</h2>
 <div class="cell">
@@ -396,7 +395,7 @@ Construction, Production &amp; Transport      Education, Legal, Social &amp; Art
 <div class="cell">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>data <span class="sc">|&gt;</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(major_group) <span class="sc">|&gt;</span></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a> <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">c</span>(communication, technical, analytical, management), mean)) <span class="sc">|&gt;</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">c</span>(communication, technical, analytical, management), mean)) <span class="sc">|&gt;</span></span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>major_group, <span class="at">names_to =</span> <span class="st">"skills"</span>, <span class="at">values_to =</span> <span class="st">"mean"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> skills, <span class="at">y =</span> major_group, <span class="at">fill =</span> mean)) <span class="sc">+</span></span>
 <span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
@@ -412,6 +411,7 @@ Construction, Production &amp; Transport      Education, Legal, Social &amp; Art
 </div>
 </div>
 <p>Each occupation group relies most on one skill dimension: STEM on analytical skill, management and business on management skill; healthcare and education on communication skill; construction, production, and transport on technical skill.</p>
+</section>
 </section>
 
 </main>

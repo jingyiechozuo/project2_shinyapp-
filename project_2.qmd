@@ -7,14 +7,15 @@ format: html
 
 
 ## DATA description 
-o\*net is dataset about the occupations and their characteristics in the U.S. Based on my project about the relationship between occupations and skills required by occupations, I chose this dataset including the major types of occupations (occupation group, preparation level), occupation codes and titles, 35 occupation skills, education level required by the occupations, and the skill dimension I extarcted before. Specifically, for each skill, we have a score for their importance in this occupation from 0-5 (continuous variables), and other variables are categorical variables. I chose 3 skills in each factor dimension, so we have 12 skills in total. 
+O*net is dataset about the occupations and their characteristics in the U.S. Based on my project about the relationship between occupations and skills required by occupations, I chose this dataset including the major types of occupations (occupation group, preparation level), occupation codes and titles, 35 occupation skills, education level required by the occupations, and the skill dimension I extarcted before. For each skill dimensions, we have the occupations' factor scores on each skill dimensions. Also, the skill dimension itself could also be a characteristic of occupation - which means the skill the occupation rely most on. Specifically, for each specific skill, we have a score for their importance in this occupation from 0-5 (continuous variables), and other variables are categorical variables. I chose 3 skills in each factor dimension, so we have 12 skills in total. 
 Specifically, we have:
-  1. occupation unique codes and titles 
-  2. job zone (the preparation level needed before people enter these occupations)
-  3. occupation groups (the major type of occupations)
-  4. scores on skill dimensions
-  5. scores on 12 specific skills
-  
+1. occupation unique codes and titles 
+2. job zone (the preparation level needed before people enter these occupations)
+3. occupation groups (the major type of occupations)
+4. skill dimension the occupation relies most on (in which dimension, the factor score is the highest)
+4. scores on skill dimensions
+5. scores on 12 specific skills
+
 ## Read data
 ```{r}
 #read data
@@ -90,7 +91,7 @@ ggplot(data,
 ```
 The distribution of the analytical skill scores is right-skewed. The peak of analytically skill scores is lower than 0 (the average), too. More than half of the occupations' analytical scores are lower than the average. 
 
-## Histogram plot (facted version)
+# Histogram plot (facted version)
 
 ```{r}
 
@@ -140,7 +141,7 @@ ggplot(data,
 ```{r}
 data |>
   group_by(major_group) |>
- summarise(across(c(communication, technical, analytical, management), mean)) |>
+  summarise(across(c(communication, technical, analytical, management), mean)) |>
   pivot_longer(-major_group, names_to = "skills", values_to = "mean") |>
   ggplot(aes(x = skills, y = major_group, fill = mean)) +
   geom_tile(color = "blue") +

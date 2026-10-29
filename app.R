@@ -1,7 +1,7 @@
 
-  # author: Jingyi Zuo
-  # O*NET Occupational Skills Explorer
-  # Explore 2026 O*NET occupations by skill dimensions, occupation group type and preparation levels
+# author: Jingyi Zuo
+# O*NET Occupational Skills Explorer
+# Explore 2026 O*NET occupations by skill dimensions, occupation group type and preparation levels
 
 library(shiny)
 library(bslib)
@@ -13,10 +13,10 @@ source("helper.R")
 ui <- page_sidebar(
   title = "O*NET Occupational Skills Explorer",
   
-# sidebar is designed: subset the data
+  # sidebar is designed: subset the data
   sidebar = sidebar(
-  # 
-  # categorical variables checkbox, and at first all levels checked by default
+    # 
+    # categorical variables checkbox, and at first all levels checked by default
     checkboxGroupInput(inputId = "group_sub", label = "Occupation Group", choices = group_levels, selected = group_levels),
     checkboxGroupInput(inputId = "prep_sub", label = "Preparation level", choices = prep_vars, selected = prep_vars),
     checkboxGroupInput(inputId = "skill_sub", label = "Skill Type", choices = skill_levels, selected = skill_levels),
@@ -54,13 +54,13 @@ ui <- page_sidebar(
               img(src = "onet.png")
     ),
     
-# Data download tab
+    # Data download tab
     nav_panel("Data Download",
               downloadButton("download", "Download CSV"),
               DT::dataTableOutput("data_table")
     ),
     
-# Data exploration tab
+    # Data exploration tab
     nav_panel("Data Exploration",
               radioButtons("summary_type", "Summary Type",
                            choices = c("Categorical", "Numeric"), inline = TRUE),
@@ -100,7 +100,7 @@ ui <- page_sidebar(
 )
 server <- function(input, output, session) {
   
-# dynamic sliders: the range follows the selected variable, but round to integers and use 0.1 as interval. 
+  # dynamic sliders: the range follows the selected variable, but round to integers and use 0.1 as interval. 
   output$slider1 <- renderUI({
     x <- data[[input$num1]]
     sliderInput("range1", paste("Range of", label(input$num1)),
@@ -115,7 +115,7 @@ server <- function(input, output, session) {
                 value = c(floor(min(x)), ceiling(max(x))), step = 0.1)
   })
   
-## subsetted data (which user selected): starts as the full data, updates only when the button is clicked
+  ## subsetted data (which user selected): starts as the full data, updates only when the button is clicked
   subset_data <- reactiveValues(df = data)
   
   observeEvent(input$subset, {
@@ -126,14 +126,14 @@ server <- function(input, output, session) {
              between(.data[[input$num1]], input$range1[1], input$range1[2]),
              between(.data[[input$num2]], input$range2[1], input$range2[2]))
   })
-# data table of the selected data
+  # data table of the selected data
   output$data_table <- DT::renderDataTable({
     validate(need(nrow(subset_data$df) > 0,
                   "No occupations match your filters. Please widen them."))
     subset_data$df
   })
   
-# download the subsetted data as a CSV file
+  # download the subsetted data as a CSV file
   output$download <- downloadHandler(
     filename = function() {
       "onet_subset.csv"
@@ -179,7 +179,7 @@ server <- function(input, output, session) {
     }
   })
   
-# Data exploration tab: numeric summaries
+  # Data exploration tab: numeric summaries
   
   # mean, median, and SD of the numeric variable at each level of the categorical variables
   output$num_table <- renderTable({
