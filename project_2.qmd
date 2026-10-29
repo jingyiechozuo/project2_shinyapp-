@@ -121,3 +121,17 @@ ggplot(data,
 
 
 Heatmap
+
+```{r}
+data |>
+  group_by(major_group) |>
+ summarise(across(c(communication, technical, analytical, management), mean)) |>
+  pivot_longer(-major_group, names_to = "skills", values_to = "mean") |>
+  ggplot(aes(x = skills, y = major_group, fill = mean)) +
+  geom_tile(color = "blue") +
+  scale_fill_gradient() +
+  labs(title = "Average skill scores on each dimension by industry",
+       x = "skill dimension", y = "Industry", fill = "Mean score")
+```
+Each occupation group relies most on one skill dimension: STEM on analytical skill, management and business on management skill; healthcare and education on communication skill; construction, production, and transport on technical skill.
+
