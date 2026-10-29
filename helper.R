@@ -9,7 +9,7 @@ data <- read.csv("onet_2026_clean.csv") |>
   mutate(preparation = factor(job_zone, levels = c("Little", "Medium", "Considerable", "Extensive"))) |>
   select(-job_zone)
 
-### categorical variables
+# categorical variables
 group_levels <- sort(unique(data$major_group))
 skill_levels <- sort(unique(data$skill_type))
 
@@ -25,7 +25,7 @@ factor_vars <- c("Communication" = "communication",
 
 numeric_vars <- names(data)[sapply(data, is.numeric)]
 
-### helper functions
+# helper functions
 
 # let variables names more reader friendly
 label <- function(var) {
