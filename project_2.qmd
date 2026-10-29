@@ -23,3 +23,28 @@ data <- read.csv("onet_2026_clean.csv") |>
   mutate (preparation = factor(job_zone, levels = c("Little","Medium","Considerable","Extensive" )))
 
 ```
+
+
+```{r}
+# investigate data
+table(data$job_zone)
+table(data$major_group)
+table(data$skill_type)
+
+table(data$preparation, data$major_group)
+table(data$major_group, data$skill_type)
+table(data$preparation, data$skill_type)
+
+```
+```{r}
+# investigate data - summarize the continous variables
+# write a function to make good programming 
+summarise_onet <- function(x){
+  data |> 
+    group_by(.data[[x]]) |>
+    summarise(across(where(is.numeric), list(mean = mean, median = median, sd = sd)))
+}
+summarise_onet("preparation")
+summarise_onet("skill_type")
+summarise_onet("major_group")
+```
